@@ -7,7 +7,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
+import zdr.dao.ProductRepository;
+import zdr.domain.Product;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 
 /**
@@ -16,7 +19,6 @@ import java.util.Arrays;
 @Configuration
 @EnableAutoConfiguration
 @ComponentScan
-@PropertySource("classpath:application.properties")
 public class Application {
 
     /*@Bean
@@ -34,5 +36,11 @@ public class Application {
         for (String beanName : beanNames) {
             System.out.println(beanName);
         }
+
+        Product p = new Product();
+        p.setDescription("My product");
+        p.setImageUrl("ImageUrl");
+        p.setPrice(BigDecimal.ONE);
+        p.setProductId("111");
     }
 }
