@@ -1,6 +1,8 @@
-package group;
+package zdr;
 
-import com.google.gson.*;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
@@ -13,6 +15,9 @@ import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.ContentType;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import zdr.domain.Aggregator;
+import zdr.domain.Info;
+import zdr.domain.TradeVolume;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -21,14 +26,10 @@ import java.io.Reader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
 
 public class App {
-    private static final String USER_AGENT = "Mozilla/5.0";
-    private static final String URL = "http://www.google.com/search?q=httpClient";
-    private static final String MOEX_URL = "http://moex.com/ru/issue.aspx?board=TQOB&code=SU26207RMFS9";
-    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("YYYY-MM-dd HH:mm:ss:SSS");
+    private static final String HOST = "www.moex.com";
+    private static final String SCHEMA = "http";
 
     public static void main(String[] args) throws IOException, URISyntaxException {
         App a = new App();
@@ -41,28 +42,27 @@ public class App {
 
 //        a.getSomething();
 //        a.getVolume();
-        a.getJsonb();
+        a.getTradeVolume("SBER", "today");
     }
 
-    private void getJsonb() throws URISyntaxException, IOException {
+    private void getTradeVolume(String ticker, String date) throws URISyntaxException, IOException {
         CloseableHttpClient httpclient = HttpClients.createDefault();
         URI uri = new URIBuilder()
-                .setScheme("http")
-                .setHost("moex.com")
-                .setPath("/iss/securities/SU26207RMFS9/aggregates.jsonp")
+                .setScheme(SCHEMA)
+                .setHost(HOST)
+                .setPath("/iss/securities/" + ticker + "/aggregates.jsonp")
                 .setParameter("iss.only", "aggregates")
                 .setParameter("iss.meta", "off")
                 .setParameter("iss.json", "extended")
-//                .setParameter("callback", "")
                 .setParameter("lang", "RU")
-                .setParameter("date", "2016-04-08")
+                .setParameter("date", date)
                 .build();
 
         HttpGet httpGet = new HttpGet(uri);
 
         ResponseHandler rh = new ResponseHandler() {
             @Override
-            public Object handleResponse(HttpResponse response) throws ClientProtocolException, IOException {
+            public Object handleResponse(HttpResponse response) throws IOException {
                 StatusLine statusLine = response.getStatusLine();
                 HttpEntity entity = response.getEntity();
 
@@ -80,20 +80,22 @@ public class App {
                 ContentType contentType = ContentType.getOrDefault(entity);
                 Charset charset = contentType.getCharset();
                 Reader reader = new InputStreamReader(entity.getContent(), charset);
-                JsonArray array = gson.fromJson(reader, JsonArray.class);
-                for (JsonElement jsonElement : array) {
-                    System.out.println("elem: " + jsonElement.getAsString());
-                }
-//            JsonObject el = list.get(1);
-//            JsonArray arra = el.getAsJsonArray();
-//            System.out.println(list.get(1));
 
-                return array;
+                JsonElement[] jsonArray = gson.fromJson(reader, JsonElement[].class);
+
+                Info charsetinfo = gson.fromJson(jsonArray[0], Info.class);
+                Aggregator aggregates = gson.fromJson(jsonArray[1], Aggregator.class);
+
+                return new TradeVolume.Builder().setAggregator(aggregates).setInfo(charsetinfo).build();
             }
         };
 
-        Object jsonMap = httpclient.execute(httpGet, rh);
-        System.out.println("list: " + jsonMap);
+        TradeVolume tradeVolume = (TradeVolume) httpclient.execute(httpGet, rh);
+        if (tradeVolume.getAggregator().isEmpty()) {
+            System.out.println("empty");
+        } else {
+            System.out.println(tradeVolume);
+        }
     }
 
     private void getSomething() throws URISyntaxException, IOException {
@@ -104,7 +106,7 @@ public class App {
                 .setPath("/iss/engines/stock/markets/bonds/boards/TQOB/securities/SU25081RMFS9.jsonp")
                 .setParameter("iss.only", "securities%2Cmarketdata")
                 .setParameter("iss.meta", "off")
-                .setParameter("callback", "callback")
+//                .setParameter("callback", "callback")
                 .setParameter("lang", "RU")
                 .setParameter("_", Long.toString(System.currentTimeMillis()))
                 .build();
