@@ -27,12 +27,12 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 
-public class App {
+public class Loader {
     private static final String HOST = "www.moex.com";
     private static final String SCHEMA = "http";
 
     public static void main(String[] args) throws IOException, URISyntaxException {
-        App a = new App();
+        Loader a = new Loader();
 
         /*long date = 1461766201305L;
         Instant instant = Instant.ofEpochMilli(date);
@@ -42,7 +42,7 @@ public class App {
 
 //        a.getSomething();
 //        a.getVolume();
-        a.getTradeVolume("SBER", "today");
+        a.getTradeVolume("SBER", "2016-05-04");
     }
 
     private void getTradeVolume(String ticker, String date) throws URISyntaxException, IOException {
@@ -123,13 +123,13 @@ public class App {
         URI uri = new URIBuilder()
                 .setScheme("http")
                 .setHost("moex.com")
-                .setPath("/iss/securities/SU26207RMFS9/aggregates.jsonp")
+                .setPath("/iss/securities/SBER/aggregates.jsonp")
                 .setParameter("iss.only", "aggregates")
                 .setParameter("iss.meta", "off")
                 .setParameter("iss.json", "extended")
 //                .setParameter("callback", "")
                 .setParameter("lang", "RU")
-                .setParameter("date", "2016-04-08")
+                .setParameter("date", "2016-05-04")
                 .build();
 
         HttpGet httpGet = new HttpGet(uri);
