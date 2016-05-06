@@ -12,6 +12,10 @@ public class Aggregator {
         return aggregates.length == 0;
     }
 
+    public Aggregate[] getAggregates() {
+        return aggregates;
+    }
+
     @Override
     public String toString() {
         return "aggregates=" + Arrays.toString(aggregates);

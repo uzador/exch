@@ -1,71 +1,42 @@
 package zdr;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.StatusLine;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpResponseException;
-import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.entity.ContentType;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import zdr.domain.Aggregator;
-import zdr.domain.Info;
+import zdr.dao.AggregateRepository;
+import zdr.domain.AggregateEntity;
 import zdr.domain.TradeVolume;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.Reader;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.charset.Charset;
-
-class Responsehandler implements ResponseHandler<TradeVolume> {
-
-    @Override
-    public TradeVolume handleResponse(HttpResponse httpResponse) throws IOException {
-        StatusLine statusLine = httpResponse.getStatusLine();
-        HttpEntity entity = httpResponse.getEntity();
-
-        if (statusLine.getStatusCode() >= 300) {
-            throw new HttpResponseException(
-                    statusLine.getStatusCode(),
-                    statusLine.getReasonPhrase());
-        }
-
-        if (entity == null) {
-            throw new ClientProtocolException("Response contains no content");
-        }
-
-        Gson gson = new GsonBuilder().create();
-        ContentType contentType = ContentType.getOrDefault(entity);
-        Charset charset = contentType.getCharset();
-        Reader reader = new InputStreamReader(entity.getContent(), charset);
-
-        JsonElement[] jsonArray = gson.fromJson(reader, JsonElement[].class);
-
-        Info charsetinfo = gson.fromJson(jsonArray[0], Info.class);
-        Aggregator aggregates = gson.fromJson(jsonArray[1], Aggregator.class);
-
-        return new TradeVolume.Builder().setAggregator(aggregates).setInfo(charsetinfo).build();
-    }
-}
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 @Component
 public class Loader {
     private static final String HOST = "www.moex.com";
     private static final String SCHEMA = "http";
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("YYYY-MM-dd");
+    private static final Set<Integer> WORK_DAYS = new HashSet<>(Arrays.asList(1, 2, 3, 4, 5));
+    private static final Logger log = LoggerFactory.getLogger(Loader.class);
+
+    @Autowired
+    private AggregateRepository aggregateRepository;
 
     public static void main(String[] args) throws IOException, URISyntaxException {
-        Loader a = new Loader();
+//        Loader a = new Loader();
 
         /*long date = 1461766201305L;
         Instant instant = Instant.ofEpochMilli(date);
@@ -75,14 +46,10 @@ public class Loader {
 
 //        a.getSomething();
 //        a.getVolume();
-        a.getTradeVolume("SBER", "2016-05-04");
+//        a.getTradeVolume("SBER", "2016-05-04");
     }
 
-    public void run() {
-        System.out.println("Hello");
-    }
-
-    private void getTradeVolume(String ticker, String date) throws URISyntaxException, IOException {
+    public TradeVolume getTradeVolume(String ticker, String date) throws URISyntaxException, IOException {
         CloseableHttpClient httpclient = HttpClients.createDefault();
         URI uri = new URIBuilder()
                 .setScheme(SCHEMA)
@@ -96,14 +63,32 @@ public class Loader {
                 .build();
 
         HttpGet httpGet = new HttpGet(uri);
-
-        Responsehandler rh = new Responsehandler();
-
+        MoexTradeVolumeResponseHandler rh = new MoexTradeVolumeResponseHandler();
         TradeVolume tradeVolume = httpclient.execute(httpGet, rh);
-        if (tradeVolume.getAggregator().isEmpty()) {
-            System.out.println("empty");
-        } else {
-            System.out.println(tradeVolume);
+
+        return tradeVolume;
+    }
+
+    public void loadTradeVolumes(String ticker, LocalDate startDate) {
+        LocalDate end = LocalDate.now();
+
+        for (LocalDate date = startDate; date.isBefore(end); date = date.plusDays(1)) {
+            if (WORK_DAYS.contains(date.getDayOfWeek().getValue())) {
+                log.info("Workday: {}", date.getDayOfWeek());
+                try {
+                    TradeVolume tradeVolume = getTradeVolume(ticker, date.format(formatter));
+                    if (tradeVolume.getAggregator().isEmpty()) {
+                        log.warn("Trade volume for '{}' on '{}' is empty", ticker, date);
+                    } else {
+                        for (int i = 0; i < tradeVolume.getAggregator().getAggregates().length; i++) {
+                            log.info(tradeVolume.getAggregator().getAggregates()[i].toString());
+                            aggregateRepository.save(new AggregateEntity(tradeVolume.getAggregator().getAggregates()[i]));
+                        }
+                    }
+                } catch (URISyntaxException | IOException e) {
+                    log.error("Could not load TradeVolume for '{}' on '{}. Exception: {}", ticker, date, e);
+                }
+            }
         }
     }
 
@@ -174,9 +159,3 @@ public class Loader {
         }
     }
 }
-
-
-/*([
-        {"charsetinfo": {"name": "utf-8"}},
-        {"aggregates": [{"market_name": "bonds", "market_title": "Рынок облигаций", "engine": "stock", "tradedate": "2016-04-08", "secid": "SU26207RMFS9", "value": 1223168244.06, "volume": 1302645, "numtrades": 139},{"market_name": "ndm", "market_title": "Режим переговорных сделок", "engine": "stock", "tradedate": "2016-04-08", "secid": "SU26207RMFS9", "value": 3286226000.00, "volume": 3500000, "numtrades": 28},{"market_name": "otc", "market_title": "ОТС", "engine": "stock", "tradedate": "2016-04-08", "secid": "SU26207RMFS9", "value": 1048401080.00, "volume": 1117685, "numtrades": 3},{"market_name": "repo", "market_title": "Рынок сделок РЕПО", "engine": "stock", "tradedate": "2016-04-08", "secid": "SU26207RMFS9", "value": 27465748171.60, "volume": 32966738, "numtrades": 83}]}
-])*/

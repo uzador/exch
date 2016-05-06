@@ -6,7 +6,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
-import java.util.Arrays;
+import java.time.LocalDate;
 
 /**
  * Created by yzadorozhnyy on 04.05.2016.
@@ -14,9 +14,10 @@ import java.util.Arrays;
 @SpringBootApplication
 @EnableScheduling
 public class Application {
-
     public static void main(String[] args) throws Exception {
         ApplicationContext ctx = SpringApplication.run(Application.class, args);
+        LocalDate start = LocalDate.of(2016, 4, 5);
+        LocalDate end = LocalDate.now();
 
         /*String[] beanNames = ctx.getBeanDefinitionNames();
         Arrays.sort(beanNames);
@@ -24,8 +25,8 @@ public class Application {
             System.out.println(beanName);
         }*/
 
-        Loader loader = (Loader) ctx.getBean("loader", Loader.class);
-        loader.run();
+        Loader loader = ctx.getBean("loader", Loader.class);
+        loader.loadTradeVolumes("SBER", LocalDate.of(2016, 4, 5));
     }
 
     @Bean

@@ -4,6 +4,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.math.BigDecimal;
 
 /**
  * Created by yzadorozhnyy on 05.05.2016.
@@ -19,9 +20,9 @@ public class AggregateEntity {
     private String engine;
     private String tradedate;
     private String secid;
-    private String value;
-    private String volume;
-    private String numtrades;
+    private BigDecimal value;
+    private Long volume;
+    private Long numtrades;
 
     public AggregateEntity() {
     }
@@ -30,11 +31,11 @@ public class AggregateEntity {
         this.engine = aggregate.getEngine();
         this.market_name = aggregate.getMarket_name();
         this.market_title = aggregate.getMarket_title();
-        this.numtrades = aggregate.getNumtrades();
+        this.numtrades = Long.valueOf(aggregate.getNumtrades());
         this.secid = aggregate.getSecid();
         this.tradedate = aggregate.getTradedate();
-        this.value = aggregate.getValue();
-        this.volume = aggregate.getVolume();
+        this.value = new BigDecimal(aggregate.getValue().orElse("0"));
+        this.volume = Long.valueOf(aggregate.getVolume().orElse("0"));
     }
 
     public Long getId() {
@@ -85,27 +86,27 @@ public class AggregateEntity {
         this.secid = secid;
     }
 
-    public String getValue() {
+    public BigDecimal getValue() {
         return value;
     }
 
-    public void setValue(String value) {
+    public void setValue(BigDecimal value) {
         this.value = value;
     }
 
-    public String getVolume() {
+    public Long getVolume() {
         return volume;
     }
 
-    public void setVolume(String volume) {
+    public void setVolume(Long volume) {
         this.volume = volume;
     }
 
-    public String getNumtrades() {
+    public Long getNumtrades() {
         return numtrades;
     }
 
-    public void setNumtrades(String numtrades) {
+    public void setNumtrades(Long numtrades) {
         this.numtrades = numtrades;
     }
 }

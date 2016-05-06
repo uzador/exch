@@ -1,5 +1,7 @@
 package zdr.domain;
 
+import java.util.Optional;
+
 /**
  * Created by yzadorozhnyy on 05.05.2016.
  */
@@ -33,12 +35,12 @@ public class Aggregate {
         return secid;
     }
 
-    public String getValue() {
-        return value;
+    public Optional<String> getValue() {
+        return Optional.ofNullable(value);
     }
 
-    public String getVolume() {
-        return volume;
+    public Optional<String> getVolume() {
+        return Optional.ofNullable(volume);
     }
 
     public String getNumtrades() {
