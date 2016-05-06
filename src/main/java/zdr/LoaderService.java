@@ -4,6 +4,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.scheduling.annotation.Scheduled;
 import zdr.dao.AggregateRepository;
 import zdr.domain.AggregateEntity;
 
@@ -29,5 +30,10 @@ public class LoaderService implements CommandLineRunner {
         a.setVolume("Volume");
 
         aggregateRepository.save(a);
+    }
+
+    @Scheduled(initialDelay = 1000, fixedRate = 60000)
+    public void run() {
+        logger.info("Number of books: " + aggregateRepository.count());
     }
 }

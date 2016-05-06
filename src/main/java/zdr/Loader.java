@@ -15,6 +15,7 @@ import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.ContentType;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.springframework.stereotype.Component;
 import zdr.domain.Aggregator;
 import zdr.domain.Info;
 import zdr.domain.TradeVolume;
@@ -27,6 +28,38 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 
+class Responsehandler implements ResponseHandler<TradeVolume> {
+
+    @Override
+    public TradeVolume handleResponse(HttpResponse httpResponse) throws IOException {
+        StatusLine statusLine = httpResponse.getStatusLine();
+        HttpEntity entity = httpResponse.getEntity();
+
+        if (statusLine.getStatusCode() >= 300) {
+            throw new HttpResponseException(
+                    statusLine.getStatusCode(),
+                    statusLine.getReasonPhrase());
+        }
+
+        if (entity == null) {
+            throw new ClientProtocolException("Response contains no content");
+        }
+
+        Gson gson = new GsonBuilder().create();
+        ContentType contentType = ContentType.getOrDefault(entity);
+        Charset charset = contentType.getCharset();
+        Reader reader = new InputStreamReader(entity.getContent(), charset);
+
+        JsonElement[] jsonArray = gson.fromJson(reader, JsonElement[].class);
+
+        Info charsetinfo = gson.fromJson(jsonArray[0], Info.class);
+        Aggregator aggregates = gson.fromJson(jsonArray[1], Aggregator.class);
+
+        return new TradeVolume.Builder().setAggregator(aggregates).setInfo(charsetinfo).build();
+    }
+}
+
+@Component
 public class Loader {
     private static final String HOST = "www.moex.com";
     private static final String SCHEMA = "http";
@@ -45,6 +78,10 @@ public class Loader {
         a.getTradeVolume("SBER", "2016-05-04");
     }
 
+    public void run() {
+        System.out.println("Hello");
+    }
+
     private void getTradeVolume(String ticker, String date) throws URISyntaxException, IOException {
         CloseableHttpClient httpclient = HttpClients.createDefault();
         URI uri = new URIBuilder()
@@ -60,37 +97,9 @@ public class Loader {
 
         HttpGet httpGet = new HttpGet(uri);
 
-        ResponseHandler rh = new ResponseHandler() {
-            @Override
-            public Object handleResponse(HttpResponse response) throws IOException {
-                StatusLine statusLine = response.getStatusLine();
-                HttpEntity entity = response.getEntity();
+        Responsehandler rh = new Responsehandler();
 
-                if (statusLine.getStatusCode() >= 300) {
-                    throw new HttpResponseException(
-                            statusLine.getStatusCode(),
-                            statusLine.getReasonPhrase());
-                }
-
-                if (entity == null) {
-                    throw new ClientProtocolException("Response contains no content");
-                }
-
-                Gson gson = new GsonBuilder().create();
-                ContentType contentType = ContentType.getOrDefault(entity);
-                Charset charset = contentType.getCharset();
-                Reader reader = new InputStreamReader(entity.getContent(), charset);
-
-                JsonElement[] jsonArray = gson.fromJson(reader, JsonElement[].class);
-
-                Info charsetinfo = gson.fromJson(jsonArray[0], Info.class);
-                Aggregator aggregates = gson.fromJson(jsonArray[1], Aggregator.class);
-
-                return new TradeVolume.Builder().setAggregator(aggregates).setInfo(charsetinfo).build();
-            }
-        };
-
-        TradeVolume tradeVolume = (TradeVolume) httpclient.execute(httpGet, rh);
+        TradeVolume tradeVolume = httpclient.execute(httpGet, rh);
         if (tradeVolume.getAggregator().isEmpty()) {
             System.out.println("empty");
         } else {
