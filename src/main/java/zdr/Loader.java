@@ -74,14 +74,13 @@ public class Loader {
 
         for (LocalDate date = startDate; date.isBefore(end); date = date.plusDays(1)) {
             if (WORK_DAYS.contains(date.getDayOfWeek().getValue())) {
-                log.info("Workday: {}", date.getDayOfWeek());
                 try {
                     TradeVolume tradeVolume = getTradeVolume(ticker, date.format(formatter));
                     if (tradeVolume.getAggregator().isEmpty()) {
                         log.warn("Trade volume for '{}' on '{}' is empty", ticker, date);
                     } else {
                         for (int i = 0; i < tradeVolume.getAggregator().getAggregates().length; i++) {
-                            log.info(tradeVolume.getAggregator().getAggregates()[i].toString());
+                            log.info("Trade Volume {} to save: {}", date,tradeVolume.getAggregator().getAggregates()[i].toString());
                             aggregateRepository.save(new AggregateEntity(tradeVolume.getAggregator().getAggregates()[i]));
                         }
                     }
