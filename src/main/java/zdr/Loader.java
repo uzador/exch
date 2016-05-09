@@ -28,7 +28,6 @@ import java.util.Set;
 public class Loader {
     private static final String HOST = "www.moex.com";
     private static final String SCHEMA = "http";
-    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("YYYY-MM-dd");
     private static final Set<Integer> WORK_DAYS = new HashSet<>(Arrays.asList(1, 2, 3, 4, 5));
     private static final Logger log = LoggerFactory.getLogger(Loader.class);
 
@@ -75,7 +74,7 @@ public class Loader {
         for (LocalDate date = startDate; date.isBefore(end); date = date.plusDays(1)) {
             if (WORK_DAYS.contains(date.getDayOfWeek().getValue())) {
                 try {
-                    TradeVolume tradeVolume = getTradeVolume(ticker, date.format(formatter));
+                    TradeVolume tradeVolume = getTradeVolume(ticker, date.format(Util.formatter));
                     if (tradeVolume.getAggregator().isEmpty()) {
                         log.warn("Trade volume for '{}' on '{}' is empty", ticker, date);
                     } else {

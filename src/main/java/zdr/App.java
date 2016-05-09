@@ -4,10 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.annotation.Bean;
-import org.springframework.scheduling.annotation.EnableScheduling;
 
 import java.time.LocalDate;
 
@@ -15,7 +12,6 @@ import java.time.LocalDate;
  * Created by yzadorozhnyy on 04.05.2016.
  */
 @SpringBootApplication
-@EnableScheduling
 public class App {
     private static final Logger log = LoggerFactory.getLogger(App.class);
 
@@ -24,6 +20,7 @@ public class App {
 
         log.info("Loader started");
         Loader loader = ctx.getBean("loader", Loader.class);
+//        loader.loadTradeVolumes("SBER", LocalDate.of(2016, 5, 1));
         loader.loadTradeVolumes("SBER", LocalDate.of(2013, 3, 25));
         log.info("Loader finished");
 

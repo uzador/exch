@@ -1,1 +1,1 @@
-# EXAMPLE CODE TO GET DATA FROM WEBSITE
+# Loader from www

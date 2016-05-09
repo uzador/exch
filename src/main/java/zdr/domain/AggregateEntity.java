@@ -1,10 +1,11 @@
 package zdr.domain;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import zdr.LocalDateConverter;
+import zdr.Util;
+
+import javax.persistence.*;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 /**
  * Created by yzadorozhnyy on 05.05.2016.
@@ -18,14 +19,12 @@ public class AggregateEntity {
     private String market_name;
     private String market_title;
     private String engine;
-    private String tradedate;
+    @Convert(converter = LocalDateConverter.class)
+    private LocalDate tradedate;
     private String secid;
     private BigDecimal value;
     private Long volume;
     private Long numtrades;
-
-    public AggregateEntity() {
-    }
 
     public AggregateEntity(Aggregate aggregate) {
         this.engine = aggregate.getEngine();
@@ -33,7 +32,7 @@ public class AggregateEntity {
         this.market_title = aggregate.getMarket_title();
         this.numtrades = Long.valueOf(aggregate.getNumtrades());
         this.secid = aggregate.getSecid();
-        this.tradedate = aggregate.getTradedate();
+        this.tradedate = LocalDate.parse(aggregate.getTradedate(), Util.formatter);
         this.value = new BigDecimal(aggregate.getValue().orElse("0"));
         this.volume = Long.valueOf(aggregate.getVolume().orElse("0"));
     }
@@ -70,11 +69,11 @@ public class AggregateEntity {
         this.engine = engine;
     }
 
-    public String getTradedate() {
+    public LocalDate getTradedate() {
         return tradedate;
     }
 
-    public void setTradedate(String tradedate) {
+    public void setTradedate(LocalDate tradedate) {
         this.tradedate = tradedate;
     }
 
