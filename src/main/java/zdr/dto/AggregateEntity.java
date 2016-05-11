@@ -1,7 +1,8 @@
-package zdr.domain;
+package zdr.dto;
 
-import zdr.LocalDateConverter;
-import zdr.Util;
+import zdr.util.LocalDateConverter;
+import zdr.util.Util;
+import zdr.domain.Aggregate;
 
 import javax.persistence.*;
 import java.math.BigDecimal;

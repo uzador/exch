@@ -20,8 +20,8 @@ public class App {
 
         log.info("Loader started");
         Loader loader = ctx.getBean("loader", Loader.class);
-//        loader.loadTradeVolumes("SBER", LocalDate.of(2016, 5, 1));
-        loader.loadTradeVolumes("SBER", LocalDate.of(2013, 3, 25));
+        loader.loadTradeVolumes("SBER", LocalDate.of(2016, 5, 1));
+//        loader.loadTradeVolumes("SBER", LocalDate.of(2013, 3, 25));
         log.info("Loader finished");
 
         SpringApplication.exit(ctx);

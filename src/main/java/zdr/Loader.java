@@ -10,8 +10,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import zdr.dao.AggregateRepository;
-import zdr.domain.AggregateEntity;
+import zdr.dto.AggregateEntity;
 import zdr.domain.TradeVolume;
+import zdr.util.Util;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -19,7 +20,6 @@ import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;

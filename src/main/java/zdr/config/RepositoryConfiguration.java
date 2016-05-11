@@ -8,7 +8,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Configuration
 @EnableAutoConfiguration
-@EntityScan(basePackages = {"zdr.domain"})
+@EntityScan(basePackages = {"zdr.dto"})
 @EnableJpaRepositories(basePackages = {"zdr.dao"})
 @EnableTransactionManagement
 public class RepositoryConfiguration {

@@ -1,4 +1,4 @@
-package zdr;
+package zdr.util;
 
 import javax.persistence.AttributeConverter;
 import javax.persistence.Convert;
