@@ -1,0 +1,32 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head lang="en">
+    <title>Spring with Javascript</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <script src="resources/templates/jquery-2.2.3.js"></script>
+    <script type="text/javascript" language="javaScript">
+        $(document).ready(function() {
+            $("#toggle").click(function(){
+                alert("Hello);
+                $('p').slideToggle( 'slow', function(){
+                    $(".log").text('Toggle Transition Complete');
+                });
+            });
+
+         });
+    </script>
+</head>
+    <body>
+        <h1>Hello</h1>
+        <p th:text="'Hello, ' + ${name} + '!'" />
+
+        <p>Click on the following button:</p>
+        <button id = "toggle"> Toggle </button>
+
+        <div class = "target">
+            <img src = "../images/jquery.jpg" alt = "jQuery" />
+        </div>
+
+        <div class = "log"></div>
+    </body>
+</html>

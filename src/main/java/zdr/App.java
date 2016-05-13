@@ -18,13 +18,13 @@ public class App {
     public static void main(String[] args) throws Exception {
         ConfigurableApplicationContext ctx = SpringApplication.run(App.class, args);
 
-        log.info("Loader started");
-        Loader loader = ctx.getBean("loader", Loader.class);
-        loader.loadTradeVolumes("SBER", LocalDate.of(2016, 5, 1));
+//        log.info("Loader started");
+//        Loader loader = ctx.getBean("loader", Loader.class);
+//        loader.loadTradeVolumes("SBER", LocalDate.of(2016, 5, 1));
 //        loader.loadTradeVolumes("SBER", LocalDate.of(2013, 3, 25));
-        log.info("Loader finished");
+//        log.info("Loader finished");
 
-        SpringApplication.exit(ctx);
+//        SpringApplication.exit(ctx);
     }
 
     /*@Bean
