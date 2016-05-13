@@ -3,11 +3,12 @@
 <head lang="en">
     <title>Spring with Javascript</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <script src="resources/templates/jquery-2.2.3.js"></script>
+    <script src="/resources/public/jquery-2.2.3.js"></script>
     <script type="text/javascript" language="javaScript">
         $(document).ready(function() {
+            alert("Hello");
             $("#toggle").click(function(){
-                alert("Hello);
+                alert("Hello");
                 $('p').slideToggle( 'slow', function(){
                     $(".log").text('Toggle Transition Complete');
                 });
