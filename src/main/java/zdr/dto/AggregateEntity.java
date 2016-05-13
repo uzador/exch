@@ -1,5 +1,6 @@
 package zdr.dto;
 
+import org.hibernate.validator.constraints.Length;
 import zdr.util.LocalDateConverter;
 import zdr.util.Util;
 import zdr.domain.Aggregate;
@@ -17,11 +18,15 @@ public class AggregateEntity {
     @Id
     @GeneratedValue
     private Long id;
+    @Column(length = 16)
     private String market_name;
+    @Column(length = 32)
     private String market_title;
+    @Column(length = 16)
     private String engine;
     @Convert(converter = LocalDateConverter.class)
     private LocalDate tradedate;
+    @Column(length = 16)
     private String secid;
     private BigDecimal value;
     private Long volume;
