@@ -1,20 +1,25 @@
 <!DOCTYPE HTML>
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
     <head lang="en">
         <title>Spring with Javascript</title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
         <script src="webjars/jquery/2.2.3/dist/jquery.min.js" type="text/javascript"></script>
-        <script src="mylibrary.js" type="text/javascript"></script>
-        <link href="mylibrary.css" rel="stylesheet" type="text/css" />
+        <!--<script src="mylibrary.js" type="text/javascript"></script>-->
+        <!--<link href="mylibrary.css" rel="stylesheet" type="text/css" />-->
         <script src="jquery.jqplot.min.js" type="text/javascript"></script>
         <link href="jquery.jqplot.min.css" rel="stylesheet" type="text/css" />
+        <!--<script src="js/myjqplotlibrary.js" type="text/javascript"></script>-->
+        <script src="highcharts-custom.js" type="text/javascript"></script>
+        <script src="js/myhighchartlib.js" type="text/javascript"></script>
         <script>
             $(document).ready(function() {
-                $.jqplot ('myChart', [[100, 110, 140, 130, 80, 75, 120, 130, 100]]);
+                myhighchart();
             });
         </script>
     </head>
     <body>
         <div id="myChart" style="height:400px; width:500px"></div>
+
+        <h1 th:text="${name}" />
     </body>
 </html>

@@ -7,4 +7,5 @@ import zdr.dto.AggregateEntity;
  * Created by yzadorozhnyy on 05.05.2016.
  */
 public interface AggregateRepository extends CrudRepository<AggregateEntity, Long> {
+    AggregateEntity findById(Long id);
 }

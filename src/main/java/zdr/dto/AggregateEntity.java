@@ -32,6 +32,9 @@ public class AggregateEntity {
     private Long volume;
     private Long numtrades;
 
+    public AggregateEntity() {
+    }
+
     public AggregateEntity(Aggregate aggregate) {
         this.engine = aggregate.getEngine();
         this.market_name = aggregate.getMarket_name();
@@ -113,5 +116,20 @@ public class AggregateEntity {
 
     public void setNumtrades(Long numtrades) {
         this.numtrades = numtrades;
+    }
+
+    @Override
+    public String toString() {
+        return "AggregateEntity{" +
+                "id=" + id +
+                ", market_name='" + market_name + '\'' +
+                ", market_title='" + market_title + '\'' +
+                ", engine='" + engine + '\'' +
+                ", tradedate=" + tradedate +
+                ", secid='" + secid + '\'' +
+                ", value=" + value +
+                ", volume=" + volume +
+                ", numtrades=" + numtrades +
+                '}';
     }
 }
