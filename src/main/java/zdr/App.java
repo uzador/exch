@@ -20,9 +20,10 @@ public class App {
         ConfigurableApplicationContext ctx = SpringApplication.run(App.class, args);
 
 //        log.info("Loader started");
-//        Loader loader = ctx.getBean("loader", Loader.class);
+        Loader loader = ctx.getBean("loader", Loader.class);
 //        loader.loadTradeVolumes("SBER", startDate);
-//        loader.loadTradeVolumes("SBER", LocalDate.of(2013, 3, 25));
+//        loader.loadTradeVolumes("SBER", LocalDate.of(2016, 5, 27));
+        loader.loadTradeVolumeOnCurrentDate();
 //        log.info("Loader finished");
 
 //        SpringApplication.exit(ctx);
