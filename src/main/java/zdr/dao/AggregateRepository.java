@@ -14,6 +14,6 @@ import java.util.List;
 public interface AggregateRepository extends CrudRepository<AggregateEntity, Long> {
     AggregateEntity findById(Long id);
 
-    @Query("SELECT new zdr.dto.VolumeDate(t.volume, t.tradedate) from AggregateEntity t WHERE t.market_name = :market_name")
+    @Query("SELECT new zdr.dto.VolumeDate(t.volume, t.tradedate) FROM AggregateEntity t WHERE t.market_name = :market_name")
     List<VolumeDate> getByMarketName(@Param("market_name") String marketName);
 }

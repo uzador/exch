@@ -81,6 +81,11 @@
         </dependency>
 
         <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <version>6.0.2</version>
@@ -96,11 +101,6 @@
             <artifactId>jquery</artifactId>
             <version>2.2.3</version>
         </dependency>
-        <!--<dependency>-->
-            <!--<groupId>org.webjars</groupId>-->
-            <!--<artifactId>jqplot</artifactId>-->
-            <!--<version>1.0.8r1250</version>-->
-        <!--</dependency>-->
     </dependencies>
 
     <build>

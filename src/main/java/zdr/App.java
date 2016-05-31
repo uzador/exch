@@ -22,7 +22,7 @@ public class App {
 //        log.info("Loader started");
         Loader loader = ctx.getBean("loader", Loader.class);
 //        loader.loadTradeVolumes("SBER", startDate);
-//        loader.loadTradeVolumes("SBER", LocalDate.of(2016, 5, 27));
+        loader.loadTradeVolumes("SBER", LocalDate.of(2016, 5, 23));
 //        loader.loadTradeVolumeOnCurrentDate();
 //        log.info("Loader finished");
 
