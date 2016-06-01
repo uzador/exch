@@ -8,13 +8,12 @@ import org.apache.http.impl.client.HttpClients;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import zdr.dao.AggregateCurrentTimeRepository;
 import zdr.dao.AggregateRepository;
 import zdr.domain.Aggregate;
-import zdr.dto.AggregateEntity;
 import zdr.domain.TradeVolume;
+import zdr.dto.AggregateEntity;
 import zdr.dto.AggregateEntityCurrentTime;
 import zdr.util.Util;
 
@@ -23,11 +22,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.sql.Date;
-import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -78,7 +74,7 @@ public class Loader {
         return tradeVolume;
     }
 
-//    @Scheduled(fixedRate = 5000)
+    //    @Scheduled(fixedRate = 5000)
     public void loadTradeVolumeOnCurrentDate() {
         String ticker = "SBER";
         try {
@@ -104,21 +100,21 @@ public class Loader {
         LocalDate end = LocalDate.now();
 
         for (LocalDate date = startDate; date.isBefore(end); date = date.plusDays(1)) {
-            if (WORK_DAYS.contains(date.getDayOfWeek().getValue())) {
-                try {
-                    TradeVolume tradeVolume = getTradeVolume(ticker, date.format(Util.formatter));
-                    if (tradeVolume.getAggregator().isEmpty()) {
-                        log.warn("Trade volume for '{}' on '{}' is empty", ticker, date);
-                    } else {
-                        for (int i = 0; i < tradeVolume.getAggregator().getAggregates().length; i++) {
-                            log.info("Trade Volume {} to save: {}", date, tradeVolume.getAggregator().getAggregates()[i].toString());
-                            aggregateRepository.save(new AggregateEntity(tradeVolume.getAggregator().getAggregates()[i]));
-                        }
+//            if (WORK_DAYS.contains(date.getDayOfWeek().getValue())) {
+            try {
+                TradeVolume tradeVolume = getTradeVolume(ticker, date.format(Util.formatter));
+                if (tradeVolume.getAggregator().isEmpty()) {
+                    log.warn("Trade volume for '{}' on '{}' is empty", ticker, date);
+                } else {
+                    for (int i = 0; i < tradeVolume.getAggregator().getAggregates().length; i++) {
+                        log.info("Trade Volume {} to save: {}", date, tradeVolume.getAggregator().getAggregates()[i].toString());
+                        aggregateRepository.save(new AggregateEntity(tradeVolume.getAggregator().getAggregates()[i]));
                     }
-                } catch (URISyntaxException | IOException e) {
-                    log.error("Could not load TradeVolume for '{}' on '{}. Exception: {}", ticker, date, e);
                 }
+            } catch (URISyntaxException | IOException e) {
+                log.error("Could not load TradeVolume for '{}' on '{}. Exception: {}", ticker, date, e);
             }
+//            }
         }
     }
 
