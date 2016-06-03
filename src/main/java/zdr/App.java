@@ -32,7 +32,7 @@ public class App {
 //        loader.loadTradeVolumes("SBER", startDate);
 //        loader.loadTradeVolumes("SBER", LocalDate.of(2016, 5, 23));
 //        loader.loadTradeVolumeOnCurrentDate();
-//        log.info("Loader finished");
+            log.info("Loader finished");
 
 //        SpringApplication.exit(ctx);
         }

@@ -15,6 +15,7 @@ import zdr.domain.Aggregate;
 import zdr.domain.TradeVolume;
 import zdr.dto.AggregateEntity;
 import zdr.dto.AggregateEntityCurrentTime;
+import zdr.util.MarketName;
 import zdr.util.Util;
 
 import java.io.BufferedReader;
@@ -107,8 +108,10 @@ public class Loader {
                     log.warn("Trade volume for '{}' on '{}' is empty", ticker, date);
                 } else {
                     for (int i = 0; i < tradeVolume.getAggregator().getAggregates().length; i++) {
-                        log.info("Trade Volume {} to save: {}", date, tradeVolume.getAggregator().getAggregates()[i].toString());
-                        aggregateRepository.save(new AggregateEntity(tradeVolume.getAggregator().getAggregates()[i]));
+                        if (!tradeVolume.getAggregator().getAggregates()[i].getMarket_name().equals(MarketName.MOEXBOARD.getValue())) {
+                            log.info("Trade Volume {} to save: {}", date, tradeVolume.getAggregator().getAggregates()[i].toString());
+                            aggregateRepository.save(new AggregateEntity(tradeVolume.getAggregator().getAggregates()[i]));
+                        }
                     }
                 }
             } catch (URISyntaxException | IOException e) {

@@ -14,6 +14,7 @@ import zdr.dto.VolumeDate;
 import zdr.service.Manager;
 
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -27,17 +28,32 @@ public class IndexController {
 
     @RequestMapping("/")
     public String index(@RequestParam(value = "id", required = false, defaultValue = "1") Long id, Model model) {
-        List<VolumeDate> chartDate = manager.getByMarketName("shares");
-        chartDate.stream().forEach(System.out::println);
+//        List<VolumeDate> chartDate = manager.getByMarketName("shares");
+//        chartDate.stream().forEach(System.out::println);
         model.addAttribute("name", id);
         return "index";
     }
 
     @JsonView(View.Summary.class)
+    @ResponseBody
     @RequestMapping(value = "/get-json")
-    public @ResponseBody Object[] getString(@RequestParam(value = "name", required = false, defaultValue = "MyName") String name) {
-        List<VolumeDate> chartDate = manager.getByMarketName("shares");
-        Object[] chartDataArr = chartDate.stream().map(element -> new long[]{element.getDate(), element.getVolume()}).toArray();
+    public List<long[]> getChartDataBySecidAndMarketName(@RequestParam(value = "marketname", required = true) String marketName,
+                                                         @RequestParam(value = "secid", required = true) String secid) {
+        List<VolumeDate> chartDate = manager.getByMarketName(marketName, secid);
+//        Object[] chartDataArr = chartDate.stream().map(element -> new long[]{element.getDate(), element.getVolume()}).toArray();
+        List<long[]> chartDataArr = chartDate.stream().map(element -> new long[]{element.getDate(), element.getVolume()}).collect(Collectors.toList());
         return chartDataArr;
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "get-secids")
+    public List<String> getSecids() {
+        return manager.getSecids();
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "get-marketname-by-secid")
+    public List<String> get(@RequestParam(value = "secid", required = true) String secId) {
+        return manager.getMarketNamesBySecid(secId);
     }
 }
