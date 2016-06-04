@@ -1,5 +1,6 @@
 package zdr.service;
 
+import org.springframework.data.repository.query.Param;
 import zdr.dto.AggregateEntity;
 import zdr.dto.VolumeDate;
 
@@ -11,5 +12,9 @@ import java.util.List;
 public interface Manager {
     AggregateEntity getAggregateEntityById(Long id);
 
-    List<VolumeDate> getByMarketName(String marketName);
+    List<VolumeDate> getByMarketName(String marketName, String secid);
+
+    List<String> getSecids();
+
+    List<String> getMarketNamesBySecid(String secid);
 }

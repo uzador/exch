@@ -22,7 +22,18 @@ public class ManagerImpl implements Manager {
         return aggregateRepository.findById(id);
     }
 
-    public List<VolumeDate> getByMarketName(String marketName) {
-        return aggregateRepository.getByMarketName(marketName);
+    @Override
+    public List<VolumeDate> getByMarketName(String marketName, String secid) {
+        return aggregateRepository.getByMarketName(marketName, secid);
+    }
+
+    @Override
+    public List<String> getSecids() {
+        return aggregateRepository.getSecids();
+    }
+
+    @Override
+    public List<String> getMarketNamesBySecid(String secid) {
+        return aggregateRepository.getMarketNamesBySecid(secid);
     }
 }
