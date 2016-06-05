@@ -13,6 +13,7 @@ import zdr.dto.View;
 import zdr.dto.VolumeDate;
 import zdr.service.Manager;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -28,9 +29,16 @@ public class IndexController {
 
     @RequestMapping("/")
     public String index(@RequestParam(value = "id", required = false, defaultValue = "1") Long id, Model model) {
-//        List<VolumeDate> chartDate = manager.getByMarketName("shares");
-//        chartDate.stream().forEach(System.out::println);
-        model.addAttribute("name", id);
+        List<String> chartNames = new ArrayList<>();
+        for (String secId : getSecids()) {
+            getMarketNameBySecid(secId).stream().forEach(marketName -> chartNames.add(String.join("-", secId, marketName)));
+        }
+//        getSecids().stream()
+//                .map(secId -> getMarketNameBySecid(secId).replaceAll();)
+//                .flatMap(secId -> getMarketNameBySecid(secId).stream())
+//                .map(marketName -> String.join("-", secId, marketName))
+//                .forEach(System.out::println);
+        model.addAttribute("chartNames", chartNames);
         return "index";
     }
 
@@ -53,7 +61,7 @@ public class IndexController {
 
     @ResponseBody
     @RequestMapping(value = "get-marketname-by-secid")
-    public List<String> get(@RequestParam(value = "secid", required = true) String secId) {
+    public List<String> getMarketNameBySecid(@RequestParam(value = "secid", required = true) String secId) {
         return manager.getMarketNamesBySecid(secId);
     }
 }
