@@ -16,7 +16,7 @@ function myhighchart(chartNames) {
             seriesCounter += 1;
 
             if (seriesCounter === names.length) {
-                createChart();
+                createChart1();
             }
         });
     });
@@ -26,7 +26,18 @@ function myhighchart(chartNames) {
         $('#myChart').highcharts('StockChart', {
 
             rangeSelector: {
-                selected: 4
+                selected: seriesOptions.length
+            },
+
+            legend: {
+                layout: 'vertical',
+                align: 'right',
+                verticalAlign: 'middle',
+                enabled: true
+            },
+
+            xAxis: {
+                type: 'datetime',
             },
 
             yAxis: {
@@ -51,6 +62,37 @@ function myhighchart(chartNames) {
             tooltip: {
                 pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y}</b> ({point.change}%)<br/>',
                 valueDecimals: 2
+            },
+
+            series: seriesOptions
+        });
+    }
+
+    function createChart1() {
+
+        $('#myChart').highcharts('StockChart', {
+
+            chart: {
+                renderTo: 'myChart',
+                type: 'line',
+                zoomType: 'x'
+            },
+            title: {
+                text: 'Volume to Date rate over time'
+            },
+            xAxis: {
+                type: 'datetime',
+            },
+            yAxis:
+               {title: {
+                   text: 'Volume rate'
+               }
+            },
+            legend: {
+               layout: 'vertical',
+               align: 'left',
+               verticalAlign: 'middle',
+               enabled: true
             },
 
             series: seriesOptions
