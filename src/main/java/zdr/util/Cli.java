@@ -26,7 +26,7 @@ public class Cli {
     public void parseCli() {
         log.info("Parsing command line");
 
-        CommandLineParser parser = new GnuParser();
+        CommandLineParser parser = new ExtendedGnuParser(true);
         CommandLine cmd = null;
 
         try {
