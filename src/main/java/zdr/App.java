@@ -10,6 +10,7 @@ import zdr.util.SymbolConfig;
 import zdr.util.Util;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 /**
  * Created by yzadorozhnyy on 04.05.2016.
@@ -21,21 +22,35 @@ public class App {
     public static void main(String[] args) throws Exception {
         ConfigurableApplicationContext ctx = SpringApplication.run(App.class, args);
 
-        if (AppConfig.getInstance().get("mode") != null && AppConfig.getInstance().get("mode").equals("loader")) {
-            log.info("Loader started");
-            final Loader loader = ctx.getBean("loader", Loader.class);
-            SymbolConfig.getInstance()
-                    .getKeys()
-                    .stream()
-                    .forEach(key -> loader.loadTradeVolumes(key, LocalDate.parse(SymbolConfig.getInstance().get(key), Util.formatter)));
+        AppConfig.getInstance()
+                .get("mode")
+                .filter(mode -> mode.equals("loader"))
+                .ifPresent(mode -> {
+                    log.info("Loader started");
 
-//        loader.loadTradeVolumes("SBER", startDate);
-//        loader.loadTradeVolumes("SBER", LocalDate.of(2016, 5, 23));
-//        loader.loadTradeVolumeOnCurrentDate();
-            log.info("Loader finished");
+                    final Loader loader = ctx.getBean("loader", Loader.class);
+                    SymbolConfig.getInstance()
+                            .getKeys()
+                            .stream()
+                            .forEach(key -> loader.loadTradeVolumes(key, LocalDate.parse(SymbolConfig.getInstance().get(key), Util.formatter)));
 
-//        SpringApplication.exit(ctx);
-        }
+                    log.info("Loader finished");
+                });
+
+        AppConfig.getInstance()
+                .get("mode")
+                .filter(mode -> mode.equals("updater"))
+                .ifPresent(mode -> {
+                    log.info("Updater started");
+
+                    final Loader loader = ctx.getBean("loader", Loader.class);
+                    SymbolConfig.getInstance()
+                            .getKeys()
+                            .stream()
+                            .forEach(key -> loader.updateTradeVolumes(key));
+
+                    log.info("Updater finished");
+                });
     }
 
     /*@Bean

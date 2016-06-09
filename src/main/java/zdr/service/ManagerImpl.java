@@ -18,11 +18,6 @@ public class ManagerImpl implements Manager {
     AggregateRepository aggregateRepository;
 
     @Override
-    public AggregateEntity getAggregateEntityById(Long id) {
-        return aggregateRepository.findById(id);
-    }
-
-    @Override
     public List<VolumeDate> getByMarketName(String marketName, String secid) {
         return aggregateRepository.getByMarketName(marketName, secid);
     }

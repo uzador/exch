@@ -26,6 +26,7 @@ import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 @Component
@@ -101,6 +102,35 @@ public class Loader {
         LocalDate end = LocalDate.now();
 
         for (LocalDate date = startDate; date.isBefore(end); date = date.plusDays(1)) {
+//            if (WORK_DAYS.contains(date.getDayOfWeek().getValue())) {
+            try {
+                TradeVolume tradeVolume = getTradeVolume(ticker, date.format(Util.formatter));
+                if (tradeVolume.getAggregator().isEmpty()) {
+                    log.warn("Trade volume for '{}' on '{}' is empty", ticker, date);
+                } else {
+                    for (int i = 0; i < tradeVolume.getAggregator().getAggregates().length; i++) {
+                        if (!tradeVolume.getAggregator().getAggregates()[i].getMarket_name().equals(MarketName.MOEXBOARD.getValue())) {
+                            log.info("Trade Volume {} to save: {}", date, tradeVolume.getAggregator().getAggregates()[i].toString());
+                            aggregateRepository.save(new AggregateEntity(tradeVolume.getAggregator().getAggregates()[i]));
+                        }
+                    }
+                }
+            } catch (URISyntaxException | IOException e) {
+                log.error("Could not load TradeVolume for '{}' on '{}. Exception: {}", ticker, date, e);
+            }
+//            }
+        }
+    }
+
+    public void updateTradeVolumes(String ticker) {
+        LocalDate startDate = aggregateRepository.getMaxDateBySecid(ticker);
+        if (startDate == null) {
+            log.warn("There is no such secid {} in database", ticker);
+            return;
+        }
+
+        LocalDate end = LocalDate.now();
+        for (LocalDate date = startDate.plusDays(1); date.isBefore(end); date = date.plusDays(1)) {
 //            if (WORK_DAYS.contains(date.getDayOfWeek().getValue())) {
             try {
                 TradeVolume tradeVolume = getTradeVolume(ticker, date.format(Util.formatter));

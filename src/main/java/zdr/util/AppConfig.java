@@ -2,6 +2,7 @@ package zdr.util;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Created by yzadorozhnyy on 01.06.2016.
@@ -21,7 +22,7 @@ public class AppConfig {
         return config.put(key, value);
     }
 
-    public String get(String key) {
-        return config.get(key);
+    public Optional<String> get(String key) {
+        return Optional.ofNullable(config.get(key));
     }
 }
