@@ -8,6 +8,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import zdr.dao.AggregateCurrentTimeRepository;
 import zdr.dao.AggregateRepository;
@@ -16,6 +17,7 @@ import zdr.domain.TradeVolume;
 import zdr.dto.AggregateEntity;
 import zdr.dto.AggregateEntityCurrentTime;
 import zdr.util.MarketName;
+import zdr.util.SymbolConfig;
 import zdr.util.Util;
 
 import java.io.BufferedReader;
@@ -76,26 +78,31 @@ public class Loader {
         return tradeVolume;
     }
 
-    //    @Scheduled(fixedRate = 5000)
+    @Scheduled(fixedRate = 10000)
     public void loadTradeVolumeOnCurrentDate() {
-        String ticker = "SBER";
-        try {
-            LocalDate timestamp = LocalDate.now();
-//            TradeVolume tradeVolume = getTradeVolume("SBER", "today");
-            TradeVolume tradeVolume = getTradeVolume("SBER", "2016-05-27");
-            if (tradeVolume.getAggregator().isEmpty()) {
-                log.warn("Trade volume for '{}' on '{}' is empty", ticker, timestamp);
-            } else {
-                for (int i = 0; i < tradeVolume.getAggregator().getAggregates().length; i++) {
-                    Aggregate aggregate = tradeVolume.getAggregator().getAggregates()[i];
-                    log.info("Trade Volume {} to save: {}", timestamp, aggregate);
-                    AggregateEntityCurrentTime aggregateEntityCurrentTime = new AggregateEntityCurrentTime(aggregate);
-                    aggregateCurrentTimeRepository.save(aggregateEntityCurrentTime);
-                }
-            }
-        } catch (URISyntaxException | IOException e) {
-            log.error("Could not load TradeVolume for {} on today. Exception: {}", ticker, e);
-        }
+        SymbolConfig.getInstance()
+                .getKeys()
+                .stream()
+                .forEach(key -> {
+                    try {
+                        LocalDate timestamp = LocalDate.now();
+                        TradeVolume tradeVolume = getTradeVolume(key, "today");
+                        if (tradeVolume.getAggregator().isEmpty()) {
+                            log.warn("Trade volume for '{}' on '{}' is empty", key, timestamp);
+                        } else {
+                            for (int i = 0; i < tradeVolume.getAggregator().getAggregates().length; i++) {
+                                if (!tradeVolume.getAggregator().getAggregates()[i].getMarket_name().equals(MarketName.MOEXBOARD.getValue())) {
+                                    Aggregate aggregate = tradeVolume.getAggregator().getAggregates()[i];
+                                    log.info("Trade Volume {} to save: {}", timestamp, aggregate);
+                                    AggregateEntityCurrentTime aggregateEntityCurrentTime = new AggregateEntityCurrentTime(aggregate);
+                                    aggregateCurrentTimeRepository.save(aggregateEntityCurrentTime);
+                                }
+                            }
+                        }
+                    } catch (URISyntaxException | IOException e) {
+                        log.error("Could not load TradeVolume for {} on today. Exception: {}", key, e);
+                    }
+                });
     }
 
     public void loadTradeVolumes(String ticker, LocalDate startDate) {
@@ -129,8 +136,8 @@ public class Loader {
             return;
         }
 
-        LocalDate end = LocalDate.now();
-        for (LocalDate date = startDate.plusDays(1); date.isBefore(end); date = date.plusDays(1)) {
+        LocalDate end = LocalDate.now().plusDays(1);
+        for (LocalDate date = startDate; date.isBefore(end); date = date.plusDays(1)) {
 //            if (WORK_DAYS.contains(date.getDayOfWeek().getValue())) {
             try {
                 TradeVolume tradeVolume = getTradeVolume(ticker, date.format(Util.formatter));

@@ -26,7 +26,7 @@ public class App {
                 .get("mode")
                 .filter(mode -> mode.equals("loader"))
                 .ifPresent(mode -> {
-                    log.info("Loader started");
+                    log.info("Mode {} started", mode);
 
                     final Loader loader = ctx.getBean("loader", Loader.class);
                     SymbolConfig.getInstance()
@@ -34,14 +34,14 @@ public class App {
                             .stream()
                             .forEach(key -> loader.loadTradeVolumes(key, LocalDate.parse(SymbolConfig.getInstance().get(key), Util.formatter)));
 
-                    log.info("Loader finished");
+                    log.info("Mode {} finished", mode);
                 });
 
         AppConfig.getInstance()
                 .get("mode")
                 .filter(mode -> mode.equals("updater"))
                 .ifPresent(mode -> {
-                    log.info("Updater started");
+                    log.info("Mode {} started", mode);
 
                     final Loader loader = ctx.getBean("loader", Loader.class);
                     SymbolConfig.getInstance()
@@ -49,7 +49,16 @@ public class App {
                             .stream()
                             .forEach(key -> loader.updateTradeVolumes(key));
 
-                    log.info("Updater finished");
+                    log.info("Mode {} finished", mode);
+                });
+
+        AppConfig.getInstance()
+                .get("mode")
+                .filter(mode -> mode.equals("current"))
+                .ifPresent(mode -> {
+                    log.info("Mode {} started", mode);
+
+                    final Loader loader = ctx.getBean("loader", Loader.class);
                 });
     }
 

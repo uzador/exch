@@ -33,11 +33,6 @@ public class IndexController {
         for (String secId : getSecids()) {
             getMarketNameBySecid(secId).stream().forEach(marketName -> chartNames.add(String.join("-", secId, marketName)));
         }
-//        getSecids().stream()
-//                .map(secId -> getMarketNameBySecid(secId).replaceAll();)
-//                .flatMap(secId -> getMarketNameBySecid(secId).stream())
-//                .map(marketName -> String.join("-", secId, marketName))
-//                .forEach(System.out::println);
         model.addAttribute("chartNames", chartNames);
         return "index";
     }

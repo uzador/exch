@@ -17,8 +17,20 @@ import java.time.LocalDate;
 @Table(name = "TRADE_VOLUME")
 public class AggregateEntity extends GenericAggregateEntity {
 
+    @Convert(converter = LocalDateConverter.class)
+    private LocalDate tradedate;
+
     public AggregateEntity(Aggregate aggregate) {
         super(aggregate);
+        this.tradedate = LocalDate.parse(aggregate.getTradedate() == null ? LocalDate.now().toString() : aggregate.getTradedate(), Util.formatter);
+    }
+
+    public LocalDate getTradedate() {
+        return tradedate;
+    }
+
+    public void setTradedate(LocalDate tradedate) {
+        this.tradedate = tradedate;
     }
 
     @Override

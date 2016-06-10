@@ -24,8 +24,6 @@ public class GenericAggregateEntity {
     private String engine;
     @Column(length = 16)
     private String secid;
-    @Convert(converter = LocalDateConverter.class)
-    private LocalDate tradedate;
     private BigDecimal value;
     private Long volume;
     private Long numtrades;
@@ -39,7 +37,6 @@ public class GenericAggregateEntity {
         this.market_title = aggregate.getMarket_title();
         this.numtrades = Long.valueOf(aggregate.getNumtrades());
         this.secid = aggregate.getSecid();
-        this.tradedate = LocalDate.parse(aggregate.getTradedate() == null ? LocalDate.now().toString() : aggregate.getTradedate(), Util.formatter);
         this.value = new BigDecimal(aggregate.getValue().orElse("0"));
         this.volume = Long.valueOf(aggregate.getVolume().orElse("0"));
     }
@@ -106,13 +103,5 @@ public class GenericAggregateEntity {
 
     public void setNumtrades(Long numtrades) {
         this.numtrades = numtrades;
-    }
-
-    public LocalDate getTradedate() {
-        return tradedate;
-    }
-
-    public void setTradedate(LocalDate tradedate) {
-        this.tradedate = tradedate;
     }
 }
